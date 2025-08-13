@@ -1,0 +1,24 @@
+import pandas as pd
+try:
+    df = pd.read_excel('C:/RAG/CLV/customer.xlsx')
+except FileNotFoundError:
+    print("ERROR")
+    exit()
+df.dropna(subset=['CustomerID'], inplace=True)
+df['CustomerID'] = df['CustomerID'].astype(int)
+
+df['InvoiceNo'] = df['InvoiceNo'].astype(str)
+df = df[~df['InvoiceNo'].str.startswith('C')]
+
+df = df[df['Quantity'] > 0]
+df = df[df['UnitPrice'] > 0]
+
+df['TotalPrice'] = df['Quantity'] * df['UnitPrice']
+
+df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
+
+df.drop_duplicates(inplace=True)
+
+output_filename = 'Your-target-destination.csv'
+df.to_csv(output_filename, index=False)
+df.info()
